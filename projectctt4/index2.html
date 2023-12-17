@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            max-width: 800px;
+            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            margin: 10px;
+            padding: 10px;
+            background-color: #3498db;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+    </style>
+    <!-- ... (your head section) ... -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+
+<body>
+    <h1>Your Payments</h1>
+
+    <table id="paymentTable">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Amount</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="paymentList"></tbody>
+    </table>
+
+    <!-- <button id="redirectButton">Go to main page</button> ... -->
+	
+	
+
+    <script type="module">
+        console.log("Script loaded");
+
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getDatabase, ref, onValue, remove } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js';
+
+        // Your Firebase configuration
+        const firebaseConfig2 = {
+            apiKey: "AIzaSyDp8E1iTxz9JVt4E5ZvoMhwAUpPlSnnYwI",
+            authDomain: "projectctt-6dc53.firebaseapp.com",
+            projectId: "projectctt-6dc53",
+            storageBucket: "projectctt-6dc53.appspot.com",
+            messagingSenderId: "262650351300",
+            appId: "1:262650351300:web:70e82eaff9fa97a3578391",
+            measurementId: "G-WK0NNSCZ1Q",
+            databaseURL: "https://projectctt-6dc53-default-rtdb.europe-west1.firebasedatabase.app/"
+        };
+
+        console.log("Initializing Firebase");
+        const firebaseApp = initializeApp(firebaseConfig2);
+        const database = getDatabase(firebaseApp);
+        const paymentsRef = ref(database, 'payments');
+
+        function displayPayments() {
+            const paymentTable = document.getElementById('paymentTable');
+            const paymentList = document.getElementById('paymentList');
+
+            // Listen for changes in the database and update the UI
+            onValue(paymentsRef, (snapshot) => {
+                paymentList.innerHTML = ''; // Clear existing list
+
+                // Iterate through each payment entry in the database
+                snapshot.forEach((childSnapshot) => {
+                    const paymentData = childSnapshot.val();
+
+                    // Create a table row for each payment
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${paymentData.first_name}</td>
+                        <td>${paymentData.last_name}</td>
+                        <td>${paymentData.total_amount}</td>
+                        <td><button class="deleteButton" data-key="${childSnapshot.key}">Delete</button></td>
+                    `;
+				
+
+                    // Append the row to the payment table body
+                    paymentList.appendChild(row);
+                });
+
+                // Add click event listener to each delete button
+                const deleteButtons = document.querySelectorAll('.deleteButton');
+                deleteButtons.forEach((button) => {
+                    button.addEventListener('click', () => {
+                        const key = button.getAttribute('data-key');
+                        deleteRow(key);
+                    });
+                });
+            }, {
+                onlyOnce: true // Fetch data only once when the page loads
+            });
+        }
+
+       // Function to delete a specific row
+function deleteRow(key) {
+    const database = getDatabase(firebaseApp);
+    const paymentRef = ref(database, 'payments/' + key);
+
+    remove(paymentRef)
+        .then(() => {
+            console.log('Data deleted successfully!');
+			
+			// Display success message
+                alert('Payment deleted successfully!');
+                
+                // Refresh the page
+                location.reload();
+        })
+        .catch((error) => {
+            console.error('Error deleting data:', error);
+        });
+		
+		 
+}
+
+
+
+        // Call the function to display payments when the page loads
+        displayPayments();
+
+        // Redirect button click event
+       // document.getElementById('redirectButton').addEventListener('click', () => {
+        //    window.location.href = "index.html";
+       // } );
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project</title>
+    <!-- Include Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
+    <!-- Your Firebase Config -->
+    <script src="firebase-config.js"></script>
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f8f8;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #paymentForm {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin: 10px 0;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="submit"] {
+            background-color: #4caf50;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        #redirectButton {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #3498db;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+
+        #successMessage {
+            color: green;
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="paymentForm">
+        <h1>Pay the bills</h1>
+        <form>
+            <label for="fname">First name:</label>
+            <input type="text" id="fname" name="fname" required>
+
+            <label for="lname">Last name:</label>
+            <input type="text" id="lname" name="lname" required>
+
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address" required>
+
+            <label for="date">Due date:</label>
+            <input type="date" id="date" name="date" required>
+
+            <label for="amount">Total amount:</label>
+            <input type="text" id="amount" name="amount" required>
+
+            <br><br>
+            <input type="submit" value="Submit" style="height:40px; width:100%">
+        </form>
+    </div>
+
+    <button id="redirectButton">Your payments</button>
+
+    <p id="successMessage">Payment done!</p>
+
+    <script type="module">
+        console.log("Script loaded");
+
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getDatabase, ref, push } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js';
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "your-api-key",
+            authDomain: "your-auth-domain",
+            projectId: "your-project-id",
+            storageBucket: "your-storage-bucket",
+            messagingSenderId: "your-messaging-sender-id",
+            appId: "your-app-id",
+            measurementId: "your-measurement-id",
+            databaseURL: "https://projectctt-6dc53-default-rtdb.europe-west1.firebasedatabase.app/"
+        };
+
+        console.log("Initializing Firebase");
+        const firebaseApp = initializeApp(firebaseConfig);
+        const database = getDatabase(firebaseApp);
+        const paymentsRef = ref(database, 'payments');
+
+        function submitForm(event) {
+            event.preventDefault();
+
+            const firstName = document.getElementById('fname').value;
+            const lastName = document.getElementById('lname').value;
+            const address = document.getElementById('address').value;
+            const dueDate = document.getElementById('date').value;
+            const amount = document.getElementById('amount').value;
+
+            console.log("Data to submit:", {
+                first_name: firstName,
+                last_name: lastName,
+                address: address,
+                due_date: dueDate,
+                total_amount: amount
+            });
+
+            // Push data to Firebase
+            push(paymentsRef, {
+                first_name: firstName,
+                last_name: lastName,
+                address: address,
+                due_date: dueDate,
+                total_amount: amount
+            })
+                .then(() => {
+                    console.log('Data submitted to Firebase!');
+                    // Display success message
+                    document.getElementById('successMessage').style.display = 'block';
+                })
+                .catch((error) => {
+                    console.error('Error submitting data to Firebase:', error);
+                });
+
+            return false;
+        }
+
+        function redirect() {
+            window.location.href = "index2.html"; // Replace with the actual URL
+        }
+
+        document.getElementById('paymentForm').addEventListener('submit', submitForm);
+        document.getElementById("redirectButton").addEventListener("click", redirect);
+    </script>
+</body>
+
+</html>

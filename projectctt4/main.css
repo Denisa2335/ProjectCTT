@@ -1,0 +1,41 @@
+
+
+div {
+    height: 100px;
+    width: 400px;
+    background: white;
+
+    position: fixed;
+    top: 20%;
+    left: 30%;
+    margin-top: -100px;
+    margin-left: -200px;
+}
+
+label{
+	font-size: 1.5em
+}
+
+h1{
+	font-size: 3em;
+	left: 10%;
+	 margin-left: 0px;
+}
+
+input { 
+          margin: -2px; 
+          padding: 2px
+        } 
+		
+button{
+height: 40px;
+    width: 100px;
+   
+
+    position: fixed;
+    top: 35%;
+    left: 15%;
+    margin-top: -100px;
+    margin-left: -200px;
+
+}	
